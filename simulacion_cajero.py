@@ -27,10 +27,10 @@ class SimulacionCajero(threading.Thread):
 
                 if tipo == "retiro":
                     saldo_actual = GestorTransacciones.retirar(cuenta, monto)
-                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Retiro $" + str(monto) + " -> Éxito. Saldo: $" + str(round(saldo_actual, 2)))
+                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Retiro $" + str(monto) + " -> Éxito. Saldo: $" + str(saldo_actual))
                 elif tipo == "deposito":
                     saldo_actual = GestorTransacciones.depositar(cuenta, monto)
-                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Depósito $" + str(monto) + " -> Éxito. Saldo: $" + str(round(saldo_actual, 2)))
+                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Depósito $" + str(monto) + " -> Éxito. Saldo: $" + str(saldo_actual))
                 elif tipo == "consulta":
                     saldo_actual = GestorTransacciones.consultar(cuenta)
                     print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Consulta -> Saldo: $" + str(saldo_actual))
