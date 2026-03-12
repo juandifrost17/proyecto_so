@@ -12,27 +12,32 @@ class SimulacionCajero(threading.Thread):
         self.banco = banco
 
     def run(self):
+        if not self.usuario.cuentas:
+            print("Cajero " + str(self.id_cajero) + " | Error: El usuario " + self.usuario.nombre + " no tiene cuentas.")
+            return
+
         operaciones = ["retiro", "deposito", "consulta"]
         for _ in range(3):
             tipo = random.choice(operaciones)
             monto = round(random.uniform(10.0, 100.0), 2)
+            cuenta_seleccionada = random.choice(self.usuario.cuentas)
 
             try:
-                cuenta = self.banco.obtener_cuenta(self.usuario.cuenta.numero_cuenta)
+                cuenta = self.banco.obtener_cuenta(cuenta_seleccionada.numero_cuenta)
 
                 if tipo == "retiro":
-                    GestorTransacciones.retirar(cuenta, monto)
-                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " | Retiro $" + str(monto) + " -> Éxito")
+                    saldo_actual = GestorTransacciones.retirar(cuenta, monto)
+                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Retiro $" + str(monto) + " -> Éxito. Saldo: $" + str(round(saldo_actual, 2)))
                 elif tipo == "deposito":
-                    GestorTransacciones.depositar(cuenta, monto)
-                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " | Depósito $" + str(monto) + " -> Éxito")
+                    saldo_actual = GestorTransacciones.depositar(cuenta, monto)
+                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Depósito $" + str(monto) + " -> Éxito. Saldo: $" + str(round(saldo_actual, 2)))
                 elif tipo == "consulta":
                     saldo_actual = GestorTransacciones.consultar(cuenta)
-                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " | Consulta -> Saldo: $" + str(saldo_actual))
+                    print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta.tipo + ") | Consulta -> Saldo: $" + str(saldo_actual))
 
             except SaldoInsuficienteException as e:
-                print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " | Error: " + str(e))
+                print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta_seleccionada.tipo + ") | Error: " + str(e))
             except MontoInvalidoException as e:
-                print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " | Error: " + str(e))
+                print("Cajero " + str(self.id_cajero) + " | " + self.usuario.nombre + " (" + cuenta_seleccionada.tipo + ") | Error: " + str(e))
 
             time.sleep(random.uniform(0.1, 0.5))
