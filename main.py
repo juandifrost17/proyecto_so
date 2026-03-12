@@ -1,19 +1,12 @@
 from datetime import date
-from cuenta_billetera import CuentaBilletera
 from usuario import Usuario
 from banco import Banco
 from gestor_transacciones import GestorTransacciones
 from simulacion_cajero import SimulacionCajero
-from excepciones import SaldoInsuficienteException, MontoInvalidoException
+from excepciones import (SaldoInsuficienteException, MontoInvalidoException, TipoCuentaInvalidoException, LimiteCuentasExcedidoException, TipoCuentaDuplicadoException)
 
 def main():
     banco = Banco(nombre="Banco Nacional")
-
-    cuenta_karel = CuentaBilletera(numero_cuenta="1020304050", saldo_inicial=150.0)
-    cuenta_maria = CuentaBilletera(numero_cuenta="5060708090", saldo_inicial=200.0)
-
-    banco.registrar_cuenta(cuenta_karel)
-    banco.registrar_cuenta(cuenta_maria)
 
     usuario_karel = Usuario(
         nombre="Karel",
@@ -21,8 +14,7 @@ def main():
         cedula="0912345678",
         email="karel@linux.com",
         fecha_nacimiento=date(2006, 11, 3),
-        telefono="0991234567",
-        cuenta=cuenta_karel
+        telefono="0991234567"
     )
 
     usuario_maria = Usuario(
@@ -31,9 +23,16 @@ def main():
         cedula="0987654321",
         email="maria@linux.com",
         fecha_nacimiento=date(2000, 5, 15),
-        telefono="0997654321",
-        cuenta=cuenta_maria
+        telefono="0997654321"
     )
+
+    try:
+        banco.asignar_cuenta_nueva(usuario_karel, saldo_inicial=150.0, tipo="ahorros")
+        banco.asignar_cuenta_nueva(usuario_karel, saldo_inicial=50.0, tipo="corriente")
+        banco.asignar_cuenta_nueva(usuario_maria, saldo_inicial=200.0, tipo="ahorros")
+    except (TipoCuentaInvalidoException, LimiteCuentasExcedidoException, TipoCuentaDuplicadoException) as e:
+        print("Error al inicializar cuentas: " + str(e))
+        return
 
     print("=" * 60)
     print("SIMULACIÓN DE CAJEROS AUTOMÁTICOS")
@@ -56,8 +55,12 @@ def main():
     print("\n--- Fase 2: Transferencia entre cuentas (doble bloqueo) ---\n")
 
     try:
-        cuenta_origen = banco.obtener_cuenta("1020304050")
-        cuenta_destino = banco.obtener_cuenta("5060708090")
+        numero_origen = usuario_karel.cuentas[0].numero_cuenta
+        numero_destino = usuario_maria.cuentas[0].numero_cuenta
+        
+        cuenta_origen = banco.obtener_cuenta(numero_origen)
+        cuenta_destino = banco.obtener_cuenta(numero_destino)
+        
         GestorTransacciones.transferir(cuenta_origen, cuenta_destino, 30.0)
         print("Transferencia de $30.0 de Karel a Maria -> Éxito")
     except SaldoInsuficienteException as e:
@@ -73,12 +76,16 @@ def main():
     print("  " + str(usuario_maria))
 
     print("\nHistorial de " + usuario_karel.nombre + ":")
-    for tx in usuario_karel.cuenta.historial_transacciones:
-        print("  -> " + tx)
+    for cuenta in usuario_karel.cuentas:
+        print("  Cuenta " + cuenta.tipo.capitalize() + " (" + cuenta.numero_cuenta + "):")
+        for tx in cuenta.historial_transacciones:
+            print("    -> " + tx)
 
     print("\nHistorial de " + usuario_maria.nombre + ":")
-    for tx in usuario_maria.cuenta.historial_transacciones:
-        print("  -> " + tx)
+    for cuenta in usuario_maria.cuentas:
+        print("  Cuenta " + cuenta.tipo.capitalize() + " (" + cuenta.numero_cuenta + "):")
+        for tx in cuenta.historial_transacciones:
+            print("    -> " + tx)
 
 if __name__ == "__main__":
     main()
