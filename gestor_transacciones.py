@@ -10,7 +10,7 @@ class GestorTransacciones:
                 raise SaldoInsuficienteException("Saldo insuficiente para retirar.")
             cuenta.saldo -= monto
             cuenta.historial_transacciones.append("Retiro: -$" + str(monto))
-            print("Retiro exitoso. Tu saldo restante es: $" + str(round(cuenta.saldo, 2)))
+            print("Retiro exitoso de: $" + str(monto))
             return cuenta.saldo
 
     @staticmethod
@@ -38,7 +38,7 @@ class GestorTransacciones:
                 cuenta_destino.saldo += monto
                 cuenta_origen.historial_transacciones.append("Transferencia enviada: -$" + str(monto) + " a " + cuenta_destino.numero_cuenta)
                 cuenta_destino.historial_transacciones.append("Transferencia recibida: +$" + str(monto) + " de " + cuenta_origen.numero_cuenta)
-                print("Transferencia de $" + str(monto) + " exitosa. Tu saldo restante es: $" + str(round(cuenta_origen.saldo, 2)))
+                print("Transferencia de $" + str(monto) + " exitosa.")
                 return cuenta_origen.saldo
 
     @staticmethod
