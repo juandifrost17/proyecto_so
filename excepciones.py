@@ -9,3 +9,12 @@ class SaldoInsuficienteException(Exception):
 
 class MontoInvalidoException(Exception):
     pass
+
+class TipoCuentaInvalidoException(Exception):
+    pass
+
+class LimiteCuentasExcedidoException(Exception):
+    pass
+
+class TipoCuentaDuplicadoException(Exception):
+    pass
