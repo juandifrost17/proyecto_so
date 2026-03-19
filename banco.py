@@ -1,7 +1,14 @@
 import threading
 import random as r
 from cuenta_billetera import CuentaBilletera
-from excepciones import (UsuarioNoEncontradoException, AliasDuplicadoException, TipoCuentaInvalidoException, LimiteCuentasExcedidoException, TipoCuentaDuplicadoException)
+from excepciones import (
+    UsuarioNoEncontradoException,
+    AliasDuplicadoException,
+    TipoCuentaInvalidoException,
+    LimiteCuentasExcedidoException,
+    TipoCuentaDuplicadoException,
+)
+
 
 class Banco:
     def __init__(self, nombre: str):
@@ -24,27 +31,35 @@ class Banco:
     def listar_cuentas(self) -> list:
         with self.mutex:
             return list(self.cuentas.values())
-        
+
     def asignar_cuenta_nueva(self, usuario, saldo_inicial: float, tipo: str):
         if tipo not in ["ahorros", "corriente"]:
             raise TipoCuentaInvalidoException("El tipo de cuenta debe ser 'ahorros' o 'corriente'.")
 
         if len(usuario.cuentas) >= 2:
-            raise LimiteCuentasExcedidoException("El usuario " + usuario.nombre + " ya alcanzó el límite máximo de 2 cuentas.")
+            raise LimiteCuentasExcedidoException(
+                "El usuario " + usuario.nombre + " ya alcanzó el límite máximo de 2 cuentas."
+            )
 
         if usuario.tiene_cuenta_tipo(tipo):
-            raise TipoCuentaDuplicadoException("El usuario " + usuario.nombre + " ya posee una cuenta de " + tipo + ".")
+            raise TipoCuentaDuplicadoException(
+                "El usuario " + usuario.nombre + " ya posee una cuenta de " + tipo + "."
+            )
 
         with self.mutex:
             nuevo_numero = str(r.randint(1000000000, 9999999999))
             while nuevo_numero in self.cuentas:
                 nuevo_numero = str(r.randint(1000000000, 9999999999))
-            
-            nueva_cuenta = CuentaBilletera(numero_cuenta=nuevo_numero, saldo_inicial=saldo_inicial, tipo=tipo)
+
+            nueva_cuenta = CuentaBilletera(
+                numero_cuenta=nuevo_numero,
+                saldo_inicial=saldo_inicial,
+                tipo=tipo,
+            )
             self.cuentas[nuevo_numero] = nueva_cuenta
             usuario.cuentas.append(nueva_cuenta)
+            return nueva_cuenta
 
     def __str__(self):
         with self.mutex:
-            texto = "[Banco: " + self.nombre + " | Cuentas: " + str(len(self.cuentas)) + "]"
-            return texto
+            return "[Banco: " + self.nombre + " | Cuentas: " + str(len(self.cuentas)) + "]"
