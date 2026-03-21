@@ -2,7 +2,6 @@ import time
 from excepciones import SaldoInsuficienteException, MontoInvalidoException
 from bitacora import logger
 
-
 def _emitir(mensaje, mostrar=True, nivel="info"):
     if mostrar:
         print(mensaje)
@@ -120,6 +119,10 @@ class GestorTransacciones:
     ):
         if monto <= 0:
             mensaje = "Monto de transferencia inválido."
+            logger.error("%s | %s", actor, mensaje)
+            raise MontoInvalidoException(mensaje)
+        if cuenta_origen.numero_cuenta == cuenta_destino.numero_cuenta:
+            mensaje = "No se puede transferir a la misma cuenta."
             logger.error("%s | %s", actor, mensaje)
             raise MontoInvalidoException(mensaje)
 
