@@ -25,28 +25,39 @@ class Banco:
     def obtener_cuenta(self, numero_cuenta: str) -> CuentaBilletera:
         with self.mutex:
             if numero_cuenta not in self.cuentas:
-                raise UsuarioNoEncontradoException("La cuenta " + numero_cuenta + " no existe.")
+                raise UsuarioNoEncontradoException(
+                    "La cuenta " + numero_cuenta + " no se encuentra registrada."
+                )
             return self.cuentas[numero_cuenta]
 
-    def listar_cuentas(self) -> list:
+    def listar_cuentas(self):
         with self.mutex:
             return list(self.cuentas.values())
 
-    def asignar_cuenta_nueva(self, usuario, saldo_inicial: float, tipo: str):
+    def asignar_cuenta_nueva(self, usuario, saldo_inicial: float, tipo: str) -> CuentaBilletera:
+        if usuario is None:
+            raise ValueError("El usuario no puede ser nulo.")
+        if saldo_inicial < 0:
+            raise ValueError("El saldo inicial no puede ser negativo.")
+
+        tipo = tipo.strip().lower()
         if tipo not in ["ahorros", "corriente"]:
-            raise TipoCuentaInvalidoException("El tipo de cuenta debe ser 'ahorros' o 'corriente'.")
-
-        if len(usuario.cuentas) >= 2:
-            raise LimiteCuentasExcedidoException(
-                "El usuario " + usuario.nombre + " ya alcanzó el límite máximo de 2 cuentas."
-            )
-
-        if usuario.tiene_cuenta_tipo(tipo):
-            raise TipoCuentaDuplicadoException(
-                "El usuario " + usuario.nombre + " ya posee una cuenta de " + tipo + "."
-            )
+            raise TipoCuentaInvalidoException("Tipo de cuenta inválido: " + tipo)
 
         with self.mutex:
+            if len(usuario.cuentas) >= 2:
+                raise LimiteCuentasExcedidoException(
+                    "El usuario " + usuario.nombre + " ya alcanzó el límite de cuentas permitido."
+                )
+            if usuario.tiene_cuenta_tipo(tipo):
+                raise TipoCuentaDuplicadoException(
+                    "El usuario " + usuario.nombre + " ya posee una cuenta de " + tipo + "."
+                )
+            if tipo == "corriente" and not usuario.tiene_cuenta_tipo("ahorros"):
+                raise TipoCuentaInvalidoException(
+                    "No se puede crear una cuenta corriente sin tener primero una cuenta de ahorros."
+                )
+
             nuevo_numero = str(r.randint(1000000000, 9999999999))
             while nuevo_numero in self.cuentas:
                 nuevo_numero = str(r.randint(1000000000, 9999999999))
