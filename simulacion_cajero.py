@@ -19,6 +19,7 @@ class SimulacionCajero(threading.Thread):
         iteraciones=3,
         operaciones_disponibles=None,
         demora_critica=1.0,
+        ubicacion="Sin ubicación",
     ):
         super().__init__(name=f"Cajero-{id_cajero}")
         self.id_cajero = id_cajero
@@ -36,7 +37,8 @@ class SimulacionCajero(threading.Thread):
             "transferencia",
         ]
         self.demora_critica = demora_critica
-        self.actor = "Cajero " + str(self.id_cajero)
+        self.ubicacion = ubicacion
+        self.actor = f"Cajero {self.id_cajero} ({self.ubicacion})"
 
     def run(self):
         if self.modo == "predefinido":
@@ -64,6 +66,29 @@ class SimulacionCajero(threading.Thread):
             print(mensaje)
             logger.error("%s", mensaje)
 
+    def _generar_monto_retiro(self, saldo_actual):
+        if saldo_actual <= 0:
+            return 0.0
+
+        minimo = 10.0
+        maximo = min(200.0, saldo_actual * 0.35)
+        if maximo < minimo:
+            return round(max(1.0, saldo_actual), 2)
+        return round(random.uniform(minimo, maximo), 2)
+
+    def _generar_monto_transferencia(self, saldo_actual):
+        if saldo_actual <= 0:
+            return 0.0
+
+        minimo = 10.0
+        maximo = min(180.0, saldo_actual * 0.30)
+        if maximo < minimo:
+            return round(max(1.0, saldo_actual), 2)
+        return round(random.uniform(minimo, maximo), 2)
+
+    def _generar_monto_deposito(self):
+        return round(random.uniform(20.0, 250.0), 2)
+
     def _ejecutar_simulacion_general(self):
         cuentas_disponibles = self.banco.listar_cuentas()
         if not cuentas_disponibles:
@@ -78,7 +103,6 @@ class SimulacionCajero(threading.Thread):
 
             try:
                 if operacion == "transferencia":
-                    monto = round(random.uniform(10.0, 100.0), 2)
                     cuentas_destino = [
                         cuenta_destino
                         for cuenta_destino in cuentas_disponibles
@@ -90,20 +114,38 @@ class SimulacionCajero(threading.Thread):
                         print(mensaje)
                         logger.info("%s", mensaje)
                     else:
-                        cuenta_destino = random.choice(cuentas_destino)
-                        GestorTransacciones.transferir(
-                            cuenta,
-                            cuenta_destino,
-                            monto,
-                            actor=self.actor,
-                            demora_critica=self.demora_critica,
-                            mostrar_mutex=True,
-                        )
+                        monto = self._generar_monto_transferencia(cuenta.saldo)
+                        if monto <= 0:
+                            mensaje = self.actor + " | Transferencia omitida: saldo insuficiente en la cuenta origen."
+                            print(mensaje)
+                            logger.info("%s", mensaje)
+                        else:
+                            cuenta_destino = random.choice(cuentas_destino)
+                            GestorTransacciones.transferir(
+                                cuenta,
+                                cuenta_destino,
+                                monto,
+                                actor=self.actor,
+                                demora_critica=self.demora_critica,
+                                mostrar_mutex=True,
+                            )
                 elif operacion == "consulta":
                     self._ejecutar_operacion(cuenta, operacion, None)
-                else:
-                    monto = round(random.uniform(10.0, 100.0), 2)
+                elif operacion == "retiro":
+                    monto = self._generar_monto_retiro(cuenta.saldo)
+                    if monto <= 0:
+                        mensaje = self.actor + " | Retiro omitido: saldo insuficiente en la cuenta."
+                        print(mensaje)
+                        logger.info("%s", mensaje)
+                    else:
+                        self._ejecutar_operacion(cuenta, operacion, monto)
+                elif operacion == "deposito":
+                    monto = self._generar_monto_deposito()
                     self._ejecutar_operacion(cuenta, operacion, monto)
+                else:
+                    mensaje = self.actor + " | Operación no reconocida: " + str(operacion)
+                    print(mensaje)
+                    logger.error("%s", mensaje)
 
             except (SaldoInsuficienteException, MontoInvalidoException) as error:
                 mensaje = self.actor + " | Error: " + str(error)

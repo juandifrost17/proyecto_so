@@ -1,0 +1,91 @@
+2026-04-02 22:23:06 | INFO | MainThread | Sistema iniciado
+2026-04-02 22:23:06 | INFO | MainThread | Datos base cargados | Usuario: Karel Gonzalez | Cuenta: 2430414645 | Tipo: ahorros | Saldo inicial: 1000.00
+2026-04-02 22:23:06 | INFO | MainThread | Datos base cargados | Usuario: Maria Lopez | Cuenta: 3162992800 | Tipo: ahorros | Saldo inicial: 500.00
+2026-04-02 22:23:12 | INFO | MainThread | Inicio simulación de retiros concurrentes | Cuenta: 2430414645 | Titular: Karel Gonzalez
+2026-04-02 22:23:12 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Solicita retiro de $96.41 en cuenta 2430414645
+2026-04-02 22:23:12 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:12 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Mutex adquirido.
+2026-04-02 22:23:12 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Solicita retiro de $79.59 en cuenta 2430414645
+2026-04-02 22:23:12 | INFO | Cajero-5 | Cajero 5 (Alborada) | Solicita retiro de $90.67 en cuenta 2430414645
+2026-04-02 22:23:12 | INFO | Cajero-5 | Cajero 5 (Alborada) | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:12 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Entra a la sección crítica.
+2026-04-02 22:23:12 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Solicita retiro de $105.39 en cuenta 2430414645
+2026-04-02 22:23:12 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:12 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Saldo antes del retiro: $1000.00
+2026-04-02 22:23:12 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:12 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Solicita retiro de $77.94 en cuenta 2430414645
+2026-04-02 22:23:12 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:13 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Saldo actualizado después del retiro: $903.59
+2026-04-02 22:23:13 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Sale de la sección crítica.
+2026-04-02 22:23:13 | INFO | Cajero-6 | Cajero 6 (Vía a la Costa) | Libera el mutex de la cuenta 2430414645.
+
+2026-04-02 22:23:13 | INFO | Cajero-5 | Cajero 5 (Alborada) | Mutex adquirido.
+2026-04-02 22:23:13 | INFO | Cajero-5 | Cajero 5 (Alborada) | Entra a la sección crítica.
+2026-04-02 22:23:13 | INFO | Cajero-5 | Cajero 5 (Alborada) | Saldo antes del retiro: $903.59
+2026-04-02 22:23:14 | INFO | Cajero-5 | Cajero 5 (Alborada) | Saldo actualizado después del retiro: $812.92
+2026-04-02 22:23:14 | INFO | Cajero-5 | Cajero 5 (Alborada) | Sale de la sección crítica.
+2026-04-02 22:23:14 | INFO | Cajero-5 | Cajero 5 (Alborada) | Libera el mutex de la cuenta 2430414645.
+
+2026-04-02 22:23:14 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Mutex adquirido.
+2026-04-02 22:23:14 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Entra a la sección crítica.
+2026-04-02 22:23:14 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Saldo antes del retiro: $812.92
+2026-04-02 22:23:15 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Saldo actualizado después del retiro: $707.53
+2026-04-02 22:23:15 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Sale de la sección crítica.
+2026-04-02 22:23:15 | INFO | Cajero-2 | Cajero 2 (Urdesa) | Libera el mutex de la cuenta 2430414645.
+
+2026-04-02 22:23:15 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Mutex adquirido.
+2026-04-02 22:23:15 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Entra a la sección crítica.
+2026-04-02 22:23:15 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Saldo antes del retiro: $707.53
+2026-04-02 22:23:16 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Saldo actualizado después del retiro: $627.94
+2026-04-02 22:23:16 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Sale de la sección crítica.
+2026-04-02 22:23:16 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Libera el mutex de la cuenta 2430414645.
+
+2026-04-02 22:23:16 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Mutex adquirido.
+2026-04-02 22:23:16 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Entra a la sección crítica.
+2026-04-02 22:23:16 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Saldo antes del retiro: $627.94
+2026-04-02 22:23:17 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Saldo actualizado después del retiro: $550.00
+2026-04-02 22:23:17 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Sale de la sección crítica.
+2026-04-02 22:23:17 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Libera el mutex de la cuenta 2430414645.
+
+2026-04-02 22:23:17 | INFO | MainThread | Sistema | Solicita consulta de saldo en cuenta 2430414645
+2026-04-02 22:23:17 | INFO | MainThread | Sistema | Intentando adquirir mutex de la cuenta 2430414645...
+2026-04-02 22:23:17 | INFO | MainThread | Sistema | Mutex adquirido para consulta.
+2026-04-02 22:23:17 | INFO | MainThread | Sistema | Saldo consultado: $550.00
+2026-04-02 22:23:17 | INFO | MainThread | Sistema | Libera el mutex después de consultar.
+
+2026-04-02 22:23:17 | INFO | MainThread | Fin simulación de retiros concurrentes | Cuenta: 2430414645 | Saldo final: 550.00
+2026-04-02 22:23:50 | INFO | MainThread | Inicio simulación de depósitos concurrentes | Cuenta: 3162992800 | Titular: Maria Lopez
+2026-04-02 22:23:50 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Solicita depósito de $52.59 en cuenta 3162992800
+2026-04-02 22:23:50 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Intentando adquirir mutex de la cuenta 3162992800...
+2026-04-02 22:23:50 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Mutex adquirido.
+2026-04-02 22:23:50 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Entra a la sección crítica.
+2026-04-02 22:23:50 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Saldo antes del depósito: $500.00
+2026-04-02 22:23:50 | INFO | Cajero-1 | Cajero 1 (Centro) | Solicita depósito de $48.66 en cuenta 3162992800
+2026-04-02 22:23:50 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Solicita depósito de $142.48 en cuenta 3162992800
+2026-04-02 22:23:50 | INFO | Cajero-1 | Cajero 1 (Centro) | Intentando adquirir mutex de la cuenta 3162992800...
+2026-04-02 22:23:50 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Intentando adquirir mutex de la cuenta 3162992800...
+2026-04-02 22:23:51 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Saldo actualizado después del depósito: $552.59
+2026-04-02 22:23:51 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Sale de la sección crítica.
+2026-04-02 22:23:51 | INFO | Cajero-3 | Cajero 3 (Kennedy) | Libera el mutex de la cuenta 3162992800.
+
+2026-04-02 22:23:51 | INFO | Cajero-1 | Cajero 1 (Centro) | Mutex adquirido.
+2026-04-02 22:23:51 | INFO | Cajero-1 | Cajero 1 (Centro) | Entra a la sección crítica.
+2026-04-02 22:23:51 | INFO | Cajero-1 | Cajero 1 (Centro) | Saldo antes del depósito: $552.59
+2026-04-02 22:23:52 | INFO | Cajero-1 | Cajero 1 (Centro) | Saldo actualizado después del depósito: $601.25
+2026-04-02 22:23:52 | INFO | Cajero-1 | Cajero 1 (Centro) | Sale de la sección crítica.
+2026-04-02 22:23:52 | INFO | Cajero-1 | Cajero 1 (Centro) | Libera el mutex de la cuenta 3162992800.
+
+2026-04-02 22:23:52 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Mutex adquirido.
+2026-04-02 22:23:52 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Entra a la sección crítica.
+2026-04-02 22:23:52 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Saldo antes del depósito: $601.25
+2026-04-02 22:23:53 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Saldo actualizado después del depósito: $743.73
+2026-04-02 22:23:53 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Sale de la sección crítica.
+2026-04-02 22:23:53 | INFO | Cajero-4 | Cajero 4 (Samborondón) | Libera el mutex de la cuenta 3162992800.
+
+2026-04-02 22:23:53 | INFO | MainThread | Sistema | Solicita consulta de saldo en cuenta 3162992800
+2026-04-02 22:23:53 | INFO | MainThread | Sistema | Intentando adquirir mutex de la cuenta 3162992800...
+2026-04-02 22:23:53 | INFO | MainThread | Sistema | Mutex adquirido para consulta.
+2026-04-02 22:23:53 | INFO | MainThread | Sistema | Saldo consultado: $743.73
+2026-04-02 22:23:53 | INFO | MainThread | Sistema | Libera el mutex después de consultar.
+
+2026-04-02 22:23:53 | INFO | MainThread | Fin simulación de depósitos concurrentes | Cuenta: 3162992800 | Saldo final: 743.73
