@@ -1,4 +1,5 @@
 from datetime import date
+import random
 from banco import Banco
 from usuario import Usuario
 from gestor_transacciones import GestorTransacciones
@@ -17,8 +18,18 @@ ERRORES_CUENTA = (
     TipoCuentaDuplicadoException,
 )
 
+CAJEROS_SISTEMA = [
+    {"id": 1, "nombre": "Cajero 1", "ubicacion": "Centro"},
+    {"id": 2, "nombre": "Cajero 2", "ubicacion": "Urdesa"},
+    {"id": 3, "nombre": "Cajero 3", "ubicacion": "Kennedy"},
+    {"id": 4, "nombre": "Cajero 4", "ubicacion": "Samborondón"},
+    {"id": 5, "nombre": "Cajero 5", "ubicacion": "Alborada"},
+    {"id": 6, "nombre": "Cajero 6", "ubicacion": "Vía a la Costa"},
+]
+
+
 def crear_datos_base():
-    banco = Banco(nombre="Banco Nacional")
+    banco = Banco(nombre="Sistema Bancario")
 
     usuario_karel = Usuario(
         nombre="Karel",
@@ -45,14 +56,20 @@ def crear_datos_base():
         cuenta_maria = banco.asignar_cuenta_nueva(usuario_maria, 500.0, "ahorros")
 
         logger.info(
-            "Datos base cargados | Usuario: %s %s | Cuenta: %s | Tipo: %s | Saldo: %.2f",
-            usuario_karel.nombre, usuario_karel.apellido,
-            cuenta_karel.numero_cuenta, cuenta_karel.tipo, cuenta_karel.saldo,
+            "Datos base cargados | Usuario: %s %s | Cuenta: %s | Tipo: %s | Saldo inicial: %.2f",
+            usuario_karel.nombre,
+            usuario_karel.apellido,
+            cuenta_karel.numero_cuenta,
+            cuenta_karel.tipo,
+            cuenta_karel.saldo,
         )
         logger.info(
-            "Datos base cargados | Usuario: %s %s | Cuenta: %s | Tipo: %s | Saldo: %.2f",
-            usuario_maria.nombre, usuario_maria.apellido,
-            cuenta_maria.numero_cuenta, cuenta_maria.tipo, cuenta_maria.saldo,
+            "Datos base cargados | Usuario: %s %s | Cuenta: %s | Tipo: %s | Saldo inicial: %.2f",
+            usuario_maria.nombre,
+            usuario_maria.apellido,
+            cuenta_maria.numero_cuenta,
+            cuenta_maria.tipo,
+            cuenta_maria.saldo,
         )
     except ERRORES_CUENTA as error:
         print("Error al cargar datos base: " + str(error))
@@ -69,7 +86,7 @@ def mostrar_menu():
     print("2. Añadir cuenta corriente")
     print("3. Simular retiros concurrentes sobre una misma cuenta")
     print("4. Simular depósitos concurrentes sobre una misma cuenta")
-    print("5. Simulación general del cajero (todas las transacciones)")
+    print("5. Simulación general de transacciones")
     print("6. Mostrar estado actual")
     print("7. Salir")
 
@@ -207,8 +224,8 @@ def seleccionar_cuenta(banco):
         print("\nCuentas disponibles:")
         for indice, cuenta in enumerate(cuentas, start=1):
             print(
-                f"{indice}. Cuenta {cuenta.tipo} | Número: {cuenta.numero_cuenta} | "
-                f"Saldo actual: ${cuenta.saldo:.2f}"
+                f"{indice}. Titular: {cuenta.titular} | Cuenta {cuenta.tipo.capitalize()} | "
+                f"Número: {cuenta.numero_cuenta} | Saldo actual: ${cuenta.saldo:.2f}"
             )
 
         try:
@@ -228,22 +245,39 @@ def seleccionar_cuenta(banco):
         print("Opción de cuenta inválida.")
 
 
+def seleccionar_cajeros_participantes():
+    cantidad = random.randint(3, 5)
+    return random.sample(CAJEROS_SISTEMA, cantidad)
+
+
+def mostrar_resumen_cajeros(participantes):
+    print("\n" + "=" * 70)
+    print("CAJEROS REGISTRADOS EN EL SISTEMA")
+    print("=" * 70)
+    print(f"Total de cajeros registrados: {len(CAJEROS_SISTEMA)}")
+    for cajero in CAJEROS_SISTEMA:
+        print(f"- {cajero['nombre']} | Ubicación: {cajero['ubicacion']}")
+    print()
+    print(f"Cajeros participantes en esta ejecución: {len(participantes)}")
+    for cajero in participantes:
+        print(f"  * {cajero['nombre']} | Ubicación: {cajero['ubicacion']}")
+    print("=" * 70)
+
+
 def mostrar_estado_actual(banco, usuarios):
     print("\n" + "=" * 70)
     print("ESTADO ACTUAL DEL SISTEMA")
     print("=" * 70)
     print(str(banco))
-
     for usuario in usuarios:
         print(f"\nUsuario: {usuario.nombre} {usuario.apellido}")
         if not usuario.cuentas:
             print("  Sin cuentas registradas.")
             continue
-
         for cuenta in usuario.cuentas:
             print(
                 f"  - Cuenta {cuenta.tipo.capitalize()} | Número: {cuenta.numero_cuenta} | "
-                f"Saldo: ${cuenta.saldo:.2f}"
+                f"Titular: {cuenta.titular} | Saldo: ${cuenta.saldo:.2f}"
             )
             if not cuenta.historial_transacciones:
                 print("      Historial: sin movimientos.")
@@ -280,12 +314,14 @@ def crear_usuario(banco, usuarios):
         )
 
         logger.info(
-            "Usuario creado | Nombre: %s %s | Cédula: %s | Email: %s | Cuenta ahorros: %s",
+            "Usuario creado | Nombre: %s %s | Cédula: %s | Email: %s | Cuenta: %s | Tipo: %s | Saldo inicial: %.2f",
             nuevo_usuario.nombre,
             nuevo_usuario.apellido,
             nuevo_usuario.cedula,
             nuevo_usuario.email,
             nueva_cuenta.numero_cuenta,
+            nueva_cuenta.tipo,
+            nueva_cuenta.saldo,
         )
 
     except KeyboardInterrupt:
@@ -311,7 +347,7 @@ def anadir_cuenta_corriente(banco, usuarios):
         nueva_cuenta = banco.asignar_cuenta_nueva(usuario, saldo_inicial, "corriente")
 
         print(
-            f"Cuenta corriente creada con éxito para {usuario.nombre}. "
+            f"Cuenta corriente creada con éxito para {usuario.nombre} {usuario.apellido}. "
             f"Número: {nueva_cuenta.numero_cuenta} | "
             f"Saldo inicial: ${nueva_cuenta.saldo:.2f}"
         )
@@ -333,40 +369,66 @@ def anadir_cuenta_corriente(banco, usuarios):
         logger.error("No se pudo crear la cuenta corriente: %s", error)
 
 
-def obtener_montos_retiro(saldo_actual):
-    if saldo_actual <= 0:
-        return [1.0, 1.0, 1.0]
+def obtener_montos_retiro(saldo_actual, cantidad_cajeros):
+    if saldo_actual <= 0 or cantidad_cajeros <= 0:
+        return [1.0] * max(cantidad_cajeros, 1)
 
-    total_a_retirar = saldo_actual * 0.45
-    monto_1 = round(total_a_retirar * 0.45, 2)
-    monto_2 = round(total_a_retirar * 0.35, 2)
-    monto_3 = round(total_a_retirar - monto_1 - monto_2, 2)
+    total_a_retirar = round(saldo_actual * 0.45, 2)
+    pesos = [random.uniform(0.8, 1.4) for _ in range(cantidad_cajeros)]
+    suma_pesos = sum(pesos)
 
-    return [max(monto_1, 1.0), max(monto_2, 1.0), max(monto_3, 1.0)]
+    montos = []
+    acumulado = 0.0
+    for indice, peso in enumerate(pesos):
+        if indice == cantidad_cajeros - 1:
+            monto = round(total_a_retirar - acumulado, 2)
+        else:
+            monto = round(total_a_retirar * (peso / suma_pesos), 2)
+            acumulado += monto
+        montos.append(max(monto, 1.0))
+
+    diferencia = round(total_a_retirar - sum(montos), 2)
+    montos[-1] = round(max(montos[-1] + diferencia, 1.0), 2)
+    return montos
+
+
+def obtener_montos_deposito(cantidad_cajeros):
+    return [round(random.uniform(40.0, 180.0), 2) for _ in range(cantidad_cajeros)]
 
 
 def simular_retiros(banco):
     print("\nSIMULACIÓN DE RETIROS CONCURRENTES")
+    participantes = seleccionar_cajeros_participantes()
+    mostrar_resumen_cajeros(participantes)
+
     cuenta = seleccionar_cuenta(banco)
     if cuenta is None:
         return
 
-    montos = obtener_montos_retiro(cuenta.saldo)
-    print("\nSe lanzarán 3 cajeros sobre la MISMA cuenta para evidenciar el mutex.")
+    montos = obtener_montos_retiro(cuenta.saldo, len(participantes))
+    print(f"\nCuenta seleccionada: {cuenta.descripcion_corta()}")
+    print(
+        f"Se lanzarán {len(participantes)} cajeros sobre la misma cuenta para evidenciar el mutex."
+    )
     print("Montos de retiro predefinidos: " + ", ".join(f"${monto:.2f}" for monto in montos))
     print(f"Saldo inicial antes de la simulación: ${cuenta.saldo:.2f}\n")
-    logger.info("Inicio simulación de retiros concurrentes | Cuenta: %s", cuenta.numero_cuenta)
+    logger.info(
+        "Inicio simulación de retiros concurrentes | Cuenta: %s | Titular: %s",
+        cuenta.numero_cuenta,
+        cuenta.titular,
+    )
 
     cajeros = []
-    for indice, monto in enumerate(montos, start=1):
+    for meta_cajero, monto in zip(participantes, montos):
         cajero = SimulacionCajero(
-            id_cajero=indice,
+            id_cajero=meta_cajero["id"],
             banco=banco,
             modo="predefinido",
             cuenta=cuenta,
             operacion="retiro",
             monto=monto,
             demora_critica=1.0,
+            ubicacion=meta_cajero["ubicacion"],
         )
         cajeros.append(cajero)
         cajero.start()
@@ -376,31 +438,46 @@ def simular_retiros(banco):
 
     print("CONSULTA FINAL DESPUÉS DE LOS RETIROS")
     GestorTransacciones.consultar(cuenta, actor="Sistema", mostrar_mutex=True)
-    logger.info("Fin simulación de retiros concurrentes | Cuenta: %s", cuenta.numero_cuenta)
+    logger.info(
+        "Fin simulación de retiros concurrentes | Cuenta: %s | Saldo final: %.2f",
+        cuenta.numero_cuenta,
+        cuenta.saldo,
+    )
 
 
 def simular_depositos(banco):
     print("\nSIMULACIÓN DE DEPÓSITOS CONCURRENTES")
+    participantes = seleccionar_cajeros_participantes()
+    mostrar_resumen_cajeros(participantes)
+
     cuenta = seleccionar_cuenta(banco)
     if cuenta is None:
         return
 
-    montos = [50.0, 75.0, 100.0]
-    print("\nSe lanzarán 3 cajeros sobre la MISMA cuenta para evidenciar el mutex.")
+    montos = obtener_montos_deposito(len(participantes))
+    print(f"\nCuenta seleccionada: {cuenta.descripcion_corta()}")
+    print(
+        f"Se lanzarán {len(participantes)} cajeros sobre la misma cuenta para evidenciar el mutex."
+    )
     print("Montos de depósito predefinidos: " + ", ".join(f"${monto:.2f}" for monto in montos))
     print(f"Saldo inicial antes de la simulación: ${cuenta.saldo:.2f}\n")
-    logger.info("Inicio simulación de depósitos concurrentes | Cuenta: %s", cuenta.numero_cuenta)
+    logger.info(
+        "Inicio simulación de depósitos concurrentes | Cuenta: %s | Titular: %s",
+        cuenta.numero_cuenta,
+        cuenta.titular,
+    )
 
     cajeros = []
-    for indice, monto in enumerate(montos, start=1):
+    for meta_cajero, monto in zip(participantes, montos):
         cajero = SimulacionCajero(
-            id_cajero=indice,
+            id_cajero=meta_cajero["id"],
             banco=banco,
             modo="predefinido",
             cuenta=cuenta,
             operacion="deposito",
             monto=monto,
             demora_critica=1.0,
+            ubicacion=meta_cajero["ubicacion"],
         )
         cajeros.append(cajero)
         cajero.start()
@@ -410,27 +487,38 @@ def simular_depositos(banco):
 
     print("CONSULTA FINAL DESPUÉS DE LOS DEPÓSITOS")
     GestorTransacciones.consultar(cuenta, actor="Sistema", mostrar_mutex=True)
-    logger.info("Fin simulación de depósitos concurrentes | Cuenta: %s", cuenta.numero_cuenta)
+    logger.info(
+        "Fin simulación de depósitos concurrentes | Cuenta: %s | Saldo final: %.2f",
+        cuenta.numero_cuenta,
+        cuenta.saldo,
+    )
 
 
 def simulacion_general(banco):
-    print("\nSIMULACIÓN GENERAL DEL CAJERO")
+    print("\nSIMULACIÓN GENERAL DE TRANSACCIONES")
     cuentas = banco.listar_cuentas()
 
     if len(cuentas) < 2:
         print("Se recomienda tener al menos 2 cuentas para ver transferencias en la simulación general.")
 
-    print("Se crearán 3 cajeros con operaciones aleatorias: retiro, depósito, consulta y transferencia.\n")
-    logger.info("Inicio simulación general del cajero")
+    participantes = seleccionar_cajeros_participantes()
+    mostrar_resumen_cajeros(participantes)
+
+    print(
+        f"Se ejecutará la simulación con {len(participantes)} cajeros disponibles. "
+        "Cada uno realizará operaciones aleatorias de retiro, depósito, consulta y transferencia.\n"
+    )
+    logger.info("Inicio simulación general de transacciones")
 
     cajeros = []
-    for indice in range(1, 4):
+    for meta_cajero in participantes:
         cajero = SimulacionCajero(
-            id_cajero=indice,
+            id_cajero=meta_cajero["id"],
             banco=banco,
             modo="aleatorio",
             iteraciones=3,
             demora_critica=0.8,
+            ubicacion=meta_cajero["ubicacion"],
         )
         cajeros.append(cajero)
         cajero.start()
@@ -439,7 +527,7 @@ def simulacion_general(banco):
         cajero.join()
 
     print("Simulación general finalizada.")
-    logger.info("Fin simulación general del cajero")
+    logger.info("Fin simulación general de transacciones")
 
 
 def main():

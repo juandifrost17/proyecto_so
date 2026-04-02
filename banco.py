@@ -9,6 +9,7 @@ from excepciones import (
     TipoCuentaDuplicadoException,
 )
 
+
 class Banco:
     def __init__(self, nombre: str):
         self.nombre = nombre
@@ -65,6 +66,7 @@ class Banco:
                 numero_cuenta=nuevo_numero,
                 saldo_inicial=saldo_inicial,
                 tipo=tipo,
+                titular=f"{usuario.nombre} {usuario.apellido}",
             )
             self.cuentas[nuevo_numero] = nueva_cuenta
             usuario.cuentas.append(nueva_cuenta)
