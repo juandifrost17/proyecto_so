@@ -1,4 +1,4 @@
-# Cajeros Automáticos — Simulador Transaccional Concurrente
+# Proyecto Sistemas Operativos - Simulador de Cajeros Automáticos
 
 > Aplicación que simula operaciones financieras concurrentes en múltiples cajeros bancarios para evidenciar el control de concurrencia y exclusión mutua.
 
@@ -24,7 +24,7 @@ El sistema opera mediante un flujo centralizado de gestión de transacciones don
 
 ## Stack Tecnológico
 
-* **Lenguaje**: Python 3.
+* **Lenguaje**: Python.
 * **Concurrencia**: Librería estándar `threading` empleando las clases `Thread` y `Lock`.
 * **Registro de Eventos**: Librería estándar `logging` configurada con salida hacia el archivo `bitacora.log`.
 * **Validaciones**: Librería estándar `re` para el control de formatos de entrada mediante expresiones regulares.
@@ -62,4 +62,4 @@ python main.py
 ## Integrantes del Grupo
 
 * **Juan Diego Sotomayor**
-* **Karel González Ruiz**
+* **Karel González**
